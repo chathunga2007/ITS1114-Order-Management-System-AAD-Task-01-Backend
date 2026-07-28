@@ -2,6 +2,7 @@ package lk.ijse.OrderManagementSystem.controller;
 
 import java.util.List;
 import lk.ijse.OrderManagementSystem.dto.AuthDTO;
+import lk.ijse.OrderManagementSystem.dto.UserDataDTO;
 import lk.ijse.OrderManagementSystem.security.JwtUtil;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,6 +58,11 @@ public class UserController {
         UserDTO userDetails = userService.getUserDetails(authDTO.getUserName(), authDTO.getPassword());
         System.out.println("Login API called for username : " + authDTO.getUserName());
         String token = jwtUtil.generateToken(userDetails);
-        return new CommonResponse(0, token, "JWT Token");
+
+        UserDataDTO userDataDTO = new UserDataDTO();
+        userDataDTO.setUserId(userDetails.getUserId());
+        userDataDTO.setToken(token);
+
+        return new CommonResponse(0, userDataDTO, "JWT Token");
     }
 }

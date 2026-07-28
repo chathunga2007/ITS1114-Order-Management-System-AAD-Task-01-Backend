@@ -3,6 +3,8 @@ package lk.ijse.OrderManagementSystem.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import lk.ijse.OrderManagementSystem.exception.CustomerException;
 import org.springframework.stereotype.Service;
 import lk.ijse.OrderManagementSystem.dto.UserDTO;
 import lk.ijse.OrderManagementSystem.entity.User;
@@ -20,23 +22,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO saveUser(UserDTO userDTO) {
+    public void saveUser(UserDTO userDTO) {
         log.info("Execute method saveUser()");
+        if(userDTO.getRole().equals(""))
+            throw new CustomerException(404, "User Roles Cannot Be Empty!" );
+
         User user = new User();
         user.setUsername(userDTO.getUsername());
-        user.setRole(userDTO.getRole());
         user.setPassword(userDTO.getPassword());
+        user.setRole(userDTO.getRole());
 
-        User saveUser = userRepository.save(user);
-        log.info("User Saved ...");
-
-        UserDTO saveUserDTO = new UserDTO();
-        saveUserDTO.setUserId(saveUser.getUserId());
-        saveUserDTO.setUsername(saveUser.getUsername());
-        saveUserDTO.setRole(saveUser.getRole());
-        saveUserDTO.setPassword(saveUser.getPassword());
-        log.info("Save User Returned ...");
-        return saveUserDTO;
+        userRepository.save(user);
     }
 
     @Override
@@ -126,6 +122,7 @@ public class UserServiceImpl implements UserService {
         User user = optionalUser.get();
 
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId(user.getUserId());
         userDTO.setUsername(user.getUsername());
         userDTO.setRole(user.getRole());
         userDTO.setPassword(user.getPassword());

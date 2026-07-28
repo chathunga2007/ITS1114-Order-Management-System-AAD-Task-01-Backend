@@ -5,7 +5,7 @@ import java.util.List;
 import lk.ijse.OrderManagementSystem.dto.UserDTO;
 
 public interface UserService {
-    UserDTO saveUser(UserDTO userDTO);
+    void saveUser(UserDTO userDTO);
     UserDTO updateUser(UserDTO userDTO);
     List<UserDTO> getAllUsers();
     UserDTO getAllUser(Long userId);
