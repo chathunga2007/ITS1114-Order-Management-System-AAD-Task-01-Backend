@@ -41,4 +41,10 @@ public class CustomerController {
         customerService.updateCustomer(customerDTO);
         return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
     }
+
+    @DeleteMapping(value = "/{customerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse deleteCustomer(@PathVariable long customerId) {
+        customerService.deleteCustomer(customerId);
+        return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
+    }
 }

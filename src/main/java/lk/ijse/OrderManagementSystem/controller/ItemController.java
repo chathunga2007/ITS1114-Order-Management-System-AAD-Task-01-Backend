@@ -47,4 +47,10 @@ public class ItemController {
         itemService.updateItem(itemDTO);
         return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
     }
+
+    @DeleteMapping(value = "/{itemId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse deleteItem(@PathVariable long itemId) {
+        itemService.deleteItem(itemId);
+        return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
+    }
 }

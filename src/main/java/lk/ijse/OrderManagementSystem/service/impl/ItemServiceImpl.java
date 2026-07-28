@@ -130,4 +130,21 @@ public class ItemServiceImpl implements ItemService {
             throw e;
         }
     }
+
+    @Override
+    public void deleteItem(long itemId) {
+        log.info("Execute Method deleteItem");
+        try {
+            Optional<Item> itemOptional = itemRepository.findById(itemId);
+            if (!itemOptional.isPresent()) {
+                log.error("Item with id {} does not exist", itemId);
+                throw new RuntimeException("Item not found");
+            }
+            itemRepository.deleteById(itemId);
+            log.info("Item deleted successfully with id: {}", itemId);
+        } catch (Exception e) {
+            log.error("Error in deleteItem: {}", e.getMessage());
+            throw e;
+        }
+    }
 }

@@ -9,4 +9,5 @@ public interface ItemService {
     ItemDTO getItemDetail(long id);
     void updateItem(ItemDTO itemDTO);
     List<ItemDTO> filterItems(String itemName);
+    void deleteItem(long itemId);
 }

@@ -116,4 +116,21 @@ public class CustomerServiceImpl implements CustomerService {
             throw e;
         }
     }
+
+    @Override
+    public void deleteCustomer(long customerId) {
+        log.info("Execute method deleteCustomer");
+        try {
+            Optional<Customer> customerOptional = customerRepository.findById(customerId);
+            if (!customerOptional.isPresent()) {
+                log.error("Customer with id {} does not exist", customerId);
+                throw new RuntimeException("Customer not found with id: " + customerId);
+            }
+            customerRepository.deleteById(customerId);
+            log.info("Customer deleted successfully with id: {}", customerId);
+        } catch (Exception e) {
+            log.error("Error occurred while deleting customer: {}", e.getMessage());
+            throw e;
+        }
+    }
 }
