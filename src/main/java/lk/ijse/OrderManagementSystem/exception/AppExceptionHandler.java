@@ -16,8 +16,8 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
         return new CommonResponse(500, "Unexpected error occurred");
     }
 
-    @ExceptionHandler(value = {CustomerException.class})
-    public ResponseEntity<CommonResponse> handleCustomException(CustomerException e, WebRequest request) {
+    @ExceptionHandler(value = {CustomException.class})
+    public ResponseEntity<CommonResponse> handleCustomException(CustomException e, WebRequest request) {
         e.printStackTrace();
         return new ResponseEntity<CommonResponse>(new CommonResponse(e.getCode(), e.getMessage()), HttpStatus.OK);
     }
