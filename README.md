@@ -31,6 +31,7 @@
   - [📦 Item API](#-item-api)
   - [🧾 Order API](#-order-api)
 - [Request & Response Examples](#request--response-examples)
+- [Exception Handling](#exception-handling)
 - [Architecture Overview](#architecture-overview)
 
 ---
@@ -89,6 +90,7 @@ OrderManagementSystem/
 │   │   │   │   ├── ItemDTO.java
 │   │   │   │   ├── OrderDTO.java
 │   │   │   │   ├── PlaceOrderDTO.java        # Order placement payload
+│   │   │   │   ├── UserDataDTO.java          # Login response DTO (userId + token)
 │   │   │   │   └── UserDTO.java
 │   │   │   ├── entity/
 │   │   │   │   ├── Customer.java
@@ -98,6 +100,9 @@ OrderManagementSystem/
 │   │   │   │   └── User.java
 │   │   │   ├── enumeration/
 │   │   │   │   └── UserStatus.java           # ADMIN, CASHIER
+│   │   │   ├── exception/
+│   │   │   │   ├── AppExceptionHandler.java  # Global REST controller advice
+│   │   │   │   └── CustomerException.java    # Custom runtime exception
 │   │   │   ├── repository/
 │   │   │   │   ├── CustomerRepository.java
 │   │   │   │   ├── ItemRepository.java       # Includes filterItems query
@@ -196,6 +201,8 @@ The application will start on: **`http://localhost:8080`**
 | See all Customers        | `GET /api/customers/all`         |
 | See single Customer      | `GET /api/customers/{customerId}`|
 | Edit Customer details    | `PUT /api/customers`             |
+| Delete Customer          | `DELETE /api/customers/{customerId}` |
+| Delete Item              | `DELETE /api/items/{itemId}`     |
 
 ---
 
@@ -206,6 +213,8 @@ The application will start on: **`http://localhost:8080`**
 | See all Orders (filter by name)   | `GET /api/orders/filter?customerName=...` |
 | See all Items (filter by name)    | `GET /api/items/filter?itemName=...`      |
 | Place an Order                    | `POST /api/orders`                        |
+| Delete Customer                   | `DELETE /api/customers/{customerId}`      |
+| Delete Item                       | `DELETE /api/items/{itemId}`              |
 
 ---
 
@@ -237,11 +246,14 @@ Send a `POST` request to the login endpoint with your credentials to obtain a JW
     ```json
     {
       "status": 0,
-      "body": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "body": {
+        "userId": 1,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      },
       "message": "JWT Token"
     }
     ```
-    *(The JWT token is returned in the `body` field of the response)*
+    *(The `body` returns `UserDataDTO` containing `userId` and the JWT `token`)*
 
 ### 🛡️ Sending Authenticated Requests
 
@@ -259,9 +271,9 @@ The system enforces Role-Based Access Control (RBAC) based on the user's role (`
 | :--- | :--- | :--- | :--- |
 | `/api/users/login` | `POST` | *Public (None)* | Authenticate user & get JWT |
 | `/api/users/**` | `POST`, `PUT`, `GET` | `ADMIN` | Manage employee accounts |
-| `/api/customers/**` | `POST`, `PUT`, `GET` | `ADMIN` or `CASHIER` | Manage customer records |
+| `/api/customers/**` | `POST`, `PUT`, `GET`, `DELETE` | `ADMIN` or `CASHIER` | Manage customer records |
 | `/api/items` | `POST`, `PUT` | `ADMIN` | Create or update inventory items |
-| `/api/items/**` | `GET` | `ADMIN` or `CASHIER` | View and filter inventory items |
+| `/api/items/**` | `GET`, `DELETE` | `ADMIN` or `CASHIER` | View, filter, and delete inventory items |
 | `/api/orders/**` | `POST`, `GET` | `ADMIN` or `CASHIER` | Place and view orders |
 
 ---
@@ -416,6 +428,23 @@ The system enforces Role-Based Access Control (RBAC) based on the user's role (`
 
 ---
 
+#### `DELETE /api/customers/{customerId}` — Delete Customer
+
+**Example:** `DELETE /api/customers/1`
+
+Deletes the customer record by customer ID.
+
+**Response:**
+```json
+{
+  "status": 0,
+  "body": null,
+  "message": "Operation Successful..."
+}
+```
+
+---
+
 ### 📦 Item API
 
 **Base URL:** `/api/items`
@@ -480,6 +509,23 @@ Returns all items whose name contains "mouse" (case-insensitive).
   "itemName": "Wireless Mouse Pro",
   "itemQTY": "30",
   "itemPrice": "2000"
+}
+```
+
+---
+
+#### `DELETE /api/items/{itemId}` — Delete Item
+
+**Example:** `DELETE /api/items/3`
+
+Deletes the item record by item ID.
+
+**Response:**
+```json
+{
+  "status": 0,
+  "body": null,
+  "message": "Operation Successful..."
 }
 ```
 
@@ -583,6 +629,15 @@ All API endpoints return the same **`CommonResponse`** wrapper:
 | `status`  | `int`   | `0` = success, `1` = failure             |
 | `body`    | `Object`| The returned data payload (can be null)  |
 | `message` | `String`| Human-readable result message            |
+
+---
+
+## ⚠️ Exception Handling
+
+The application uses a global `@ControllerAdvice` (`AppExceptionHandler`) for centralized error handling across all REST endpoints:
+
+- **Custom Exceptions (`CustomerException`)**: Returns a structured `CommonResponse` with custom status codes and error messages.
+- **Unhandled Exceptions (`Exception`)**: Handles general server errors gracefully with HTTP status 500 and message `"Unexpected error occurred"`.
 
 ---
 
